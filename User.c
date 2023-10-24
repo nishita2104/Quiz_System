@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 #define SERVER_IP "172.19.235.128"  // Replace with the actual IP address of the server
@@ -32,13 +33,14 @@ int main() {
         perror("Connection Failed");
         exit(EXIT_FAILURE);
     }
-    printf("Choose your subject from \n Maths \n Science \n English \n");
+    printf("Welcome to Maths Quiz \n");
     
-    char message[512];
-    fgets(message, sizeof(message), stdin);
-    message[strlen(message) - 1] = '\0';
-    send(client_socket, message, strlen(message), 0);
-    printf("Message sent to server: %s\n", message);
+    // char message[512];
+    // fgets(message, sizeof(message), stdin);
+    // message[strlen(message) - 1] = '\0';
+    // /*change 1*/
+    // send(client_socket, message, strlen(message), 0);
+    // printf("Message sent to server: %s\n", message);
 
     char buffer[MAX_BUFFER_SIZE] = {0};
     // printf("started rec");
@@ -48,6 +50,7 @@ int main() {
     char answer[512];
     fgets(answer, sizeof(answer), stdin);
     answer[strlen(answer) - 1] = '\0';
+    /*change copy*/
     send(client_socket, answer, strlen(answer), 0);
     printf("answer sent\n");
     memset(buffer,'\0', sizeof(buffer));
