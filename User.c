@@ -7,7 +7,7 @@
 
 #define PORT 8090
 #define MAX_BUFFER_SIZE 1024
-#define SERVER_IP "172.27.59.160"  // Replace with the actual IP address of the server
+#define SERVER_IP "172.18.213.18"  // Replace with the actual IP address of the server
 
 int main() {
     int client_socket;

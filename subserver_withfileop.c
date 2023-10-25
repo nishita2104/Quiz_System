@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include "cdma.c"
+#include <stdbool.h>
+#include <pthread.h>
+/**/
+#define PORT 8080
+#define PORT2 8090
+#define MAX_BUFFER_SIZE 512
+#define SERVER_IP "172.18.213.18"
+#define NUMBER_OF_CONNECTIONS 2
+FILE *outputFile;
+bool server_responded;
+bool client_responded[8];
+char server_side[512];
+char client_side[512];
+struct CDMA cdma;
+int server_fd, new_socket;
+int subserver_socket;
+struct sockaddr_in server_address;
+struct sockaddr_in address;
+int addrlen = sizeof(address);
+struct in_addr ip_addr;
+
+void client_server(int id)
+{
+    fprintf(outputFile, "%s\n",("client_server function called with id %d \n", id));
+    //client_responded[id] = true;
+    // int new_socket;
+    // int server_fd, new_socket;
+    fprintf(outputFile, "%s\n",("waiting over accept %d \n", id));
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+        fprintf(outputFile, "%s\n",("%d",addrlen));
+        fprintf(outputFile, "%s\n",("The source IP address is %s\n", inet_ntoa(ip_addr)));
+        // fprintf(outputFile, "%s\n",(inet_ntoa(address));
+        perror("Accept failed");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(outputFile, "%s\n",("connected to client no %d \n", id));
+    // char buffer[MAX_BUFFER_SIZE] = {0};
+    // read(new_socket, buffer, MAX_BUFFER_SIZE);
+    // fprintf(outputFile, "%s\n",("Message from client: %s\n", buffer);
+    //assuming maths 
+    while(server_responded==false)
+    {
+        ;
+    }
+    client_responded[id] = false;
+    //now we send Q to the clients   
+    send(new_socket, server_side, strlen(server_side), 0);
+    //we recieve response from clients and respectively set the client_responded[id] to true
+    char response[MAX_BUFFER_SIZE] = {0};
+    recv(new_socket, response, 512, 0);
+    // fprintf(outputFile, "%s\n",("%s \n",response);
+    int data[2] = {0,0};
+    fprintf(outputFile, "%s\n",("hello5 id %d %s\n",id, response));
+    if(response=="2")
+    {data[0] = 1;}
+    else if(response=="3")
+    {data[1] = 1; }
+    else if(response=="4")
+    {data[0] = 1; data[1]=1;}
+    // fprintf(outputFile, "%s\n",("hello6");
+    Encode(&cdma, data, NUMBER_OF_CONNECTIONS, id);
+    // fprintf(outputFile, "%s\n",("hello7");
+    client_responded[id] = true;
+    fprintf(outputFile, "%s\n",("hiiiyyy id %d",id));
+    // pthread_exit(NULL);
+}
+
+int main(){
+    outputFile = fopen("input.txt", "w");
+    printf("checkpt-1");
+    server_responded = false;
+    char character;
+    
+    
+    for(int i=0;i<512;i++)
+    {
+        client_side[i] = 0;
+    }
+
+    if ((subserver_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(PORT);
+
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    if (inet_pton(AF_INET, SERVER_IP, &server_address.sin_addr) <= 0) {
+        perror("Invalid address/ Address not supported");
+        exit(EXIT_FAILURE);
+    }
+
+     if (connect(subserver_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
+        perror("Connection Failed");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(outputFile, "%s\n",("Connected to server \n"));
+
+    
+    
+    ip_addr.s_addr = address.sin_addr.s_addr;
+    fprintf(outputFile, "%s\n",("The source IP address is %s\n", inet_ntoa(ip_addr)));
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+ 
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT2);
+
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+ 
+    // Listening for incoming connections
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+ 
+    fprintf(outputFile, "%s\n",("Server listening on port %d...\n", PORT2));
+ 
+    // Accepting incoming connections
+    setUp(&cdma, NUMBER_OF_CONNECTIONS);
+    while(1){
+        fprintf(outputFile, "%s\n",("Hello1\n"));
+    pthread_t client_servers[NUMBER_OF_CONNECTIONS];
+    
+    int nos[NUMBER_OF_CONNECTIONS];
+    for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
+    {
+        nos[i] = i;
+    }
+    fprintf(outputFile, "%s\n",("Hello2\n"));
+    for(int i = 0; i < NUMBER_OF_CONNECTIONS; i++) {
+    //fprintf(outputFile, "%s\n",("Hello3\n");
+        pthread_create(&client_servers[i], NULL, (void *)&client_server, (void *)nos[i]);
+        fprintf(outputFile, "%s\n",("%d\n",i));
+    //fprintf(outputFile, "%s\n",("Hello3.5\n");
+    }
+    //fprintf(outputFile, "%s\n",("hiii jjjjj"));
+    for(int i=0;i<512;i++)
+        server_side[i] = 0;
+    int val = recv(subserver_socket, server_side, MAX_BUFFER_SIZE,0);
+    server_responded = true;
+
+    //Server has sent the Q and it is set in server_side
+    bool all_clients_responded = true;
+    fprintf(outputFile, "%s\n",("Hello4\n"));
+    for(int i=0;i<128;i++)
+    {
+        ;
+    }
+    sleep(4);
+    for(int i=0;i<NUMBER_OF_CONNECTIONS;i++)
+    {
+        fprintf(outputFile, "%s\n",("client_responded %d is %d \n",i, client_responded[i]));
+        if(client_responded[i]==false)
+        all_clients_responded = false;
+    }
+    // fprintf(outputFile, "%s\n",("hope\n");
+    while(all_clients_responded == false)
+    {
+        all_clients_responded = true;
+        for(int i=0;i<NUMBER_OF_CONNECTIONS;i++)
+        {
+            if(client_responded[i]==false)
+            {
+            all_clients_responded = false;
+            // fprintf(outputFile, "%s\n",(" false set %d ",i);
+            }
+        }
+    }
+    //send the cdma encoded bitstring to server
+    fprintf(outputFile, "%s\n",("hope\n"));
+    for(int i =0;i<sizeof(cdma.response); i++)
+    {
+        fprintf(outputFile, "%s\n",("%d",cdma.response[i]));
+    }
+    send(subserver_socket, cdma.response, sizeof(cdma.response), 0);
+    fprintf(outputFile, "%s\n",("sent answer to server"));
+    }
+
+}

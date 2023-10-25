@@ -118,8 +118,8 @@ int main() {
                 printf("hiii-6\n");
                 for (int j = 0; j < NUMBER_OF_CONNECTIONS; j++)
                 {
-                    sum1 += int_array[j]*(codes.copy[i][j]);
-                    sum2 += int_array[j+NUMBER_OF_CONNECTIONS]*(codes.copy[i][j]);
+                    sum1 += int_array[j]*(codes.wtable[i][j]);
+                    sum2 += int_array[j+NUMBER_OF_CONNECTIONS]*(codes.wtable[i][j]);
                     // printf("%d\n", codes.wtable[i][j]);
                 }
                 sum1 = sum1/NUMBER_OF_CONNECTIONS;
