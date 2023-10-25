@@ -41,7 +41,10 @@ int main() {
     // /*change 1*/
     // send(client_socket, message, strlen(message), 0);
     // printf("Message sent to server: %s\n", message);
-
+    // char client_id[MAX_BUFFER_SIZE]={0};
+    // int vv = recv(client_socket, client_id, MAX_BUFFER_SIZE,0);
+    // printf("id %s \n",client_id);
+    // printf("\n");
     char buffer[MAX_BUFFER_SIZE] = {0};
     // printf("started rec");
     int val = recv(client_socket, buffer, MAX_BUFFER_SIZE,0);
@@ -51,6 +54,7 @@ int main() {
     fgets(answer, sizeof(answer), stdin);
     answer[strlen(answer) - 1] = '\0';
     /*change copy*/
+    printf("answer input");
     send(client_socket, answer, strlen(answer), 0);
     printf("answer sent\n");
     memset(buffer,'\0', sizeof(buffer));

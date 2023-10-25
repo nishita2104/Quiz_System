@@ -51,6 +51,10 @@ void client_server(int id)
     }
     //client_responded[id] = false;
     // now we send Q to the clients
+    char client_id[MAX_BUFFER_SIZE];
+    snprintf(client_id, MAX_BUFFER_SIZE, "%d", id);
+    // send(new_socket, client_id, strlen(client_id), 0);
+    
     send(new_socket, server_side, strlen(server_side), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
     char response[MAX_BUFFER_SIZE] = {0};
