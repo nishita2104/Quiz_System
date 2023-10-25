@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include "subserver.c"
 #include "cdma.c"
  
 #define PORT 8080
