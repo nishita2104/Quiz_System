@@ -5,9 +5,9 @@
 #include <arpa/inet.h>
 
 
-#define PORT 8080
+#define PORT 8090
 #define MAX_BUFFER_SIZE 1024
-#define SERVER_IP "172.19.235.128"  // Replace with the actual IP address of the server
+#define SERVER_IP "172.27.59.160"  // Replace with the actual IP address of the server
 
 int main() {
     int client_socket;

@@ -3,11 +3,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include "subserver.c"
+// #include "subserver.c"
 #include "cdma.c"
- 
+
+#define NUMBER_OF_CONNECTIONS 2
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
+#define ARRAY_SIZE NUMBER_OF_CONNECTIONS*MAX_BUFFER_SIZE / (sizeof(int)*128)
 
 int* charToBitArray(char c) {
     int* bitArray = (int*)malloc(8 * sizeof(int));
@@ -24,9 +26,9 @@ int* charToBitArray(char c) {
 }
 
 int main() {
-    struct CDMA * codes;
-    int data[] = {1,1,1,1,1,1,1,1};
-    setUp(codes, data, 8);
+    struct CDMA codes;
+    // int data[] = {1,1,1,1,1,1,1,1};
+    setUp(&codes, NUMBER_OF_CONNECTIONS);
     int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -84,7 +86,7 @@ int main() {
     outputFile = fopen("output.txt", "w");
     if (outputFile == NULL) {
         perror("Error opening output file");
-        fclose(inputFile);  // Close the input file
+          // Close the input file
         return 1;
     }
     // if(strcmp(buffer,"Maths")==0)
@@ -93,79 +95,50 @@ int main() {
             strcpy(serverquestion,"What is square root of 25?\n 1. 2\n 2. 3\n 3. 5\n 4. 7\n Enter 1, 2, 3 or 4\n");
             int val;
     // printf("%s\n",serverquestion);
-            if((val = send(new_socket, serverquestion, strlen(serverquestion), 0)) < 0)
-            {
-                printf("Send Failed. Error!!!!\n");
-                // return -1;  
-            }else{
-                // printf("%d", val);
-                // printf("%s", serverquestion);
-                printf("sent question\n");
-            }
+            
             // printf("%d \n", val);
- 
-            int int_array[4*MAX_BUFFER_SIZE / sizeof(int)];
-            char response[MAX_BUFFER_SIZE] = {0};
+            send(new_socket, serverquestion, strlen(serverquestion), 0);
+            printf("hiii-4\n");
+            int int_array[ARRAY_SIZE];
+            printf("size %ld \n",ARRAY_SIZE);
+            //={1,-1,1,-1,1,-1,1,-1,2,0,2,0,2,0,2,0};
             recv(new_socket, int_array, sizeof(int_array) ,0);
+            for(int i=0;i<ARRAY_SIZE;i++){
+                printf("%d ",int_array[i]);
+            }
+            char response[MAX_BUFFER_SIZE] = {0};
             // int * bitarray1 = charToBitArray(response[0]);
             // int * bitarray2 = charToBitArray(response[1]);
             // printf("%s is response \n", response);
-
-            for (int i = 0; i < 8; i++)
+            printf("hiii-5\n");
+            for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
             {
                 int sum1=0;
                 int sum2=0;
-                for (int j = 0; j < 8; j++)
+                printf("hiii-6\n");
+                for (int j = 0; j < NUMBER_OF_CONNECTIONS; j++)
                 {
-                    sum1 += int_array[j]*(codes->copy[i][j]);
-                    sum2 += int_array[j+8]*(codes->copy[i][j]);
+                    sum1 += int_array[j]*(codes.copy[i][j]);
+                    sum2 += int_array[j+NUMBER_OF_CONNECTIONS]*(codes.copy[i][j]);
+                    // printf("%d\n", codes.wtable[i][j]);
                 }
+                sum1 = sum1/NUMBER_OF_CONNECTIONS;
+                sum2 = sum2/NUMBER_OF_CONNECTIONS;
+                printf("hiii-7\n");
                 memset(serverresponse,'\0', sizeof(serverresponse));
+                printf("%d %d\n",sum1,sum2);
                 if (sum1==0&&sum2==1)
                 {
                     strcpy(serverresponse,"Correct\0");
                 }
                 else strcpy(serverresponse,"Incorrect\0");
+                printf("hiii-8\n");
                 fprintf(outputFile, "%s\n", serverresponse);
             }
-            if((val = send(new_socket, serverquestion, strlen(serverquestion), 0)) < 0)
-            {
-                printf("Send Failed. Error!!!!\n");
-                // return -1;  
-            }else{
-                // printf("%d", val);
-                // printf("%s", serverquestion);
-                printf("sent question\n");
-            }
-            // printf("%d \n", val);
-            int int_array[MAX_BUFFER_SIZE / sizeof(int)];
-            char response[MAX_BUFFER_SIZE] = {0};
-            recv(new_socket, int_array, sizeof(int_array) ,0);
-            // int * bitarray1 = charToBitArray(response[0]);
-            // int * bitarray2 = charToBitArray(response[1]);
-            // printf("%s is response \n", response);
-
-            for (int i = 0; i < 8; i++)
-            {
-                int sum1=0;
-                int sum2=0;
-                for (int j = 0; j < 8; j++)
-                {
-                    sum1 += bitarray1[j]*(codes->copy[i][j]);
-                    sum2 += bitarray2[j]*(codes->copy[i][j]);
-                }
-                memset(serverresponse,'\0', sizeof(serverresponse));
-                if (sum1==0&&sum2==1)
-                {
-                    strcpy(serverresponse,"Correct\0");
-                }
-                else strcpy(serverresponse,"Incorrect\0");
-                fprintf(outputFile, "%d %s\n", codes->copy[i] ,serverresponse);
-            }
-        //    printf("hiii\n");
+            
  
         }
-            // send(new_socket, serverquestion, strlen(serverquestion), 0);
+    fclose(outputFile);  // send(new_socket, serverquestion, strlen(serverquestion), 0);
     close(new_socket);
     close(server_fd);
 
