@@ -11,19 +11,19 @@
 #define MAX_BUFFER_SIZE 1024
 #define ARRAY_SIZE NUMBER_OF_CONNECTIONS*MAX_BUFFER_SIZE / (sizeof(int)*128)
 
-int* charToBitArray(char c) {
-    int* bitArray = (int*)malloc(8 * sizeof(int));
-    if (bitArray == NULL) {
-        perror("Memory allocation failed");
-        exit(1);
-    }
+// int* charToBitArray(char c) {
+//     int* bitArray = (int*)malloc(8 * sizeof(int));
+//     if (bitArray == NULL) {
+//         perror("Memory allocation failed");
+//         exit(1);
+//     }
 
-    for (int i = 0; i < 8; i++) {
-        bitArray[i] = (c >> i) & 1;
-    }
+//     for (int i = 0; i < 8; i++) {
+//         bitArray[i] = (c >> i) & 1;
+//     }
 
-    return bitArray;
-}
+//     return bitArray;
+// }
 
 int main() {
     struct CDMA codes;
@@ -98,7 +98,7 @@ int main() {
             
             // printf("%d \n", val);
             send(new_socket, serverquestion, strlen(serverquestion), 0);
-            printf("hiii-4\n");
+            // printf("hiii-4\n");
             int int_array[ARRAY_SIZE];
             printf("size %ld \n",ARRAY_SIZE);
             //={1,-1,1,-1,1,-1,1,-1,2,0,2,0,2,0,2,0};
@@ -110,12 +110,17 @@ int main() {
             // int * bitarray1 = charToBitArray(response[0]);
             // int * bitarray2 = charToBitArray(response[1]);
             // printf("%s is response \n", response);
-            printf("hiii-5\n");
+            // for (int i = 0; i < 2*NUMBER_OF_CONNECTIONS; i++)
+            // {
+            //     printf("checking here %d %d ",i,int_array[i]);
+            // }
+            printf("end checking\n");
+            // printf("hiii-5\n");
             for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
             {
                 int sum1=0;
                 int sum2=0;
-                printf("hiii-6\n");
+                // printf("hiii-6\n");
                 for (int j = 0; j < NUMBER_OF_CONNECTIONS; j++)
                 {
                     sum1 += int_array[j]*(codes.wtable[i][j]);
@@ -124,15 +129,22 @@ int main() {
                 }
                 sum1 = sum1/NUMBER_OF_CONNECTIONS;
                 sum2 = sum2/NUMBER_OF_CONNECTIONS;
-                printf("hiii-7\n");
+                // printf("hiii-7\n");
                 memset(serverresponse,'\0', sizeof(serverresponse));
-                printf("%d %d\n",sum1,sum2);
+                printf("%d %d\n",sum2,sum1);
                 if (sum1==0&&sum2==1)
                 {
                     strcpy(serverresponse,"Correct\0");
                 }
                 else strcpy(serverresponse,"Incorrect\0");
-                printf("hiii-8\n");
+                //printf("hiii-8\n");
+                for (int j = 0; j < NUMBER_OF_CONNECTIONS; j++)
+                {
+                
+                    fprintf(outputFile, "%d ",(codes.wtable[i][j]) );
+                }
+                fprintf(outputFile, "%s ","id:" );
+                fprintf(outputFile, "%d ",i );
                 fprintf(outputFile, "%s\n", serverresponse);
             }
             

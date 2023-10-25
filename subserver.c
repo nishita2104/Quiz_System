@@ -28,7 +28,7 @@ struct in_addr ip_addr;
 void client_server(int id)
 {
     printf("client_server function called with id %d \n", id);
-    // client_responded[id] = true;
+    client_responded[id] = false;
     //  int new_socket;
     //  int server_fd, new_socket;
     printf("waiting over accept %d \n", id);
@@ -49,7 +49,7 @@ void client_server(int id)
     {
         ;
     }
-    client_responded[id] = false;
+    //client_responded[id] = false;
     // now we send Q to the clients
     send(new_socket, server_side, strlen(server_side), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
@@ -57,7 +57,7 @@ void client_server(int id)
     recv(new_socket, response, 512, 0);
     // printf("%s \n",response);
     int data[2] = {0, 0};
-    printf("hello5 id %d %s\n", id, response);
+    printf("id %d %s\n", id, response);
     if (strcmp(response,"2")==0)
     {
         data[0] = 1;
@@ -81,8 +81,8 @@ void client_server(int id)
         }
         printf("\n");
     }
-    printf("%d ", data[0]);
-    printf("%d \n", data[1]);
+    printf("%d ", data[1]);
+    printf("%d \n", data[0]);
     Encode2(&cdma, data, NUMBER_OF_CONNECTIONS, id);
     // printf("hello7");
     for (int i = 0; i < 4; i++)
@@ -90,6 +90,7 @@ void client_server(int id)
         printf("%d ", cdma.response[i]);
     }
     printf("\n %d",sizeof(cdma.response));
+    printf("\n");
     client_responded[id] = true;
     // printf("hiiiyyy id %d", id);
     // pthread_exit(NULL);
@@ -160,7 +161,7 @@ int main()
 
     // Accepting incoming connections
     setUp(&cdma, NUMBER_OF_CONNECTIONS);
-    while (1)
+    // while (1)
     {
         // printf("Hello1\n");
         pthread_t client_servers[NUMBER_OF_CONNECTIONS];
@@ -176,6 +177,7 @@ int main()
             // printf("Hello3\n");
             pthread_create(&client_servers[i], NULL, (void *)&client_server, (void *)nos[i]);
             printf("%d\n", i);
+            printf("\n");
             // printf("Hello3.5\n");
         }
         // printf("hiii jjjjj");
@@ -217,7 +219,9 @@ int main()
         {
             printf("%d ", cdma.response[i]);
         }
-        send(subserver_socket, cdma.response, sizeof(cdma.response), 0);
+        
+        printf("%d is size \n",sizeof(cdma.response));
+        send(subserver_socket, cdma.response, 2*sizeof(cdma.response), 0);
         printf("sent answer to server");
     }
 }

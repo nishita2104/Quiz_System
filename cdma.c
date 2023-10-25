@@ -90,7 +90,7 @@ void Encode2(struct CDMA *channel, int *data, int num_stations, int id)
     }
     for (int i = 0; i < 4; i++)
 {
-    printf("%d ",channel->response[i]);
+    // printf("%d ",channel->response[i]);
 }
 }
 
