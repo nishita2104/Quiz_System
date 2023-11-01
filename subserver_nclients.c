@@ -30,7 +30,9 @@ struct in_addr ip_addr;
 void client_server(int id)
 {
     printf("client_server function called with id %d \n", id);
-    client_responded[id] = true;
+    client_responded[id] = false;
+    //  int new_socket;
+    //  int server_fd, new_socket;
     printf("waiting over accept %d \n", id);
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
     {
@@ -41,12 +43,20 @@ void client_server(int id)
         exit(EXIT_FAILURE);
     }
     printf("connected to client no %d \n", id);
+    // char buffer[MAX_BUFFER_SIZE] = {0};
+    // read(new_socket, buffer, MAX_BUFFER_SIZE);
+    // printf("Message from client: %s\n", buffer);
+    // assuming maths
     while (server_responded == false)
     {
         ;
     }
-    client_responded[id] = false;
+    //client_responded[id] = false;
+    // now we send Q to the clients
+    char user_id[MAX_BUFFER_SIZE] ;
+    itoa(id, user_id, 10);
     send(new_socket, server_side, strlen(server_side), 0);
+    send(new_socket, user_id, strlen(user_id), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
     char response[MAX_BUFFER_SIZE] = {0};
     recv(new_socket, response, 512, 0);
@@ -87,6 +97,7 @@ void client_server(int id)
     printf("\n %d",sizeof(cdma.response));
     printf("\n");
     client_responded[id] = true;
+
 }
 
 void server_process()
