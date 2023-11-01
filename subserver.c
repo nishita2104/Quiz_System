@@ -10,7 +10,7 @@
 #define PORT 8080
 #define PORT2 8090
 #define MAX_BUFFER_SIZE 512
-#define SERVER_IP "172.18.213.18"
+#define SERVER_IP "172.19.235.128"
 #define NUMBER_OF_CONNECTIONS 2
 
 bool server_responded;
@@ -51,7 +51,10 @@ void client_server(int id)
     }
     //client_responded[id] = false;
     // now we send Q to the clients
-    send(new_socket, server_side, strlen(server_side), 0);
+    char qs[2][1024];
+    sprintf(qs[0],"%d",id);
+    strcpy(qs[1], server_side);
+    send(new_socket, qs, sizeof(qs), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
     char response[MAX_BUFFER_SIZE] = {0};
     recv(new_socket, response, 512, 0);

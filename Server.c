@@ -90,9 +90,22 @@ int main() {
         return 1;
     }
     // if(strcmp(buffer,"Maths")==0)
+    char options[4][MAX_BUFFER_SIZE]={0};
+
     {
-            // printf("subj is maths \n");
-            strcpy(serverquestion,"What is square root of 25?\n 1. 2\n 2. 3\n 3. 5\n 4. 7\n Enter 1, 2, 3 or 4\n");
+            printf("Enter Question: \n");
+            fgets(serverquestion, sizeof(serverquestion), stdin);
+            
+            serverquestion[strlen(serverquestion)-1] = ' ';
+                for(int i=0;i<4;i++)
+                {
+                    fgets(options[i], sizeof(options[i]), stdin);
+                    serverquestion[strlen(serverquestion)-1] = ' ';
+                    serverquestion[strlen(serverquestion)] = '\n';
+                    strcpy(serverquestion+(strlen(serverquestion)+1),options[i]);
+                }
+            serverquestion[strlen(serverquestion)] = '\0';
+            // strcpy(serverquestion,"What is square root of 25?\n 1. 2\n 2. 3\n 3. 5\n 4. 7\n Enter 1, 2, 3 or 4\n");
             int val;
     // printf("%s\n",serverquestion);
             
