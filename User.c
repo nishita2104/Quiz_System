@@ -34,24 +34,15 @@ int main() {
         exit(EXIT_FAILURE);
     }
     printf("Welcome to Maths Quiz \n");
-    
-    // char message[512];
-    // fgets(message, sizeof(message), stdin);
-    // message[strlen(message) - 1] = '\0';
-    // /*change 1*/
-    // send(client_socket, message, strlen(message), 0);
-    // printf("Message sent to server: %s\n", message);
 
     char buffer[2][MAX_BUFFER_SIZE] = {0};
     printf("started receiving \n");
     int val = recv(client_socket, buffer, sizeof(buffer),0);
-    //printf("checkpt-2");
     printf("id is: %s \n", buffer[0]);
     printf("%s \n", buffer[1]);
     char answer[512];
     fgets(answer, sizeof(answer), stdin);
     answer[strlen(answer) - 1] = '\0';
-    /*change copy*/
     send(client_socket, answer, strlen(answer), 0);
     printf("answer sent\n");
     memset(buffer,'\0', sizeof(buffer));

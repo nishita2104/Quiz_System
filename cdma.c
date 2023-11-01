@@ -18,28 +18,6 @@ void listenTo(struct CDMA *channel, int sourceStation, int num_stations);
 int buildWalshTable(struct CDMA *channel, int len, int i1, int i2, int j1, int j2, int isBar);
 void showWalshTable(struct CDMA *channel, int num_stations);
 
-// int main() {
-//     struct CDMA channel;
-//     setUp(&channel, 2);
-//     int data0[2] = {0,1};
-//     int data1[2] = {1,0};
-//     // Encode(channel, data0, 2, 0);    
-//     // Encode(channel, data1, 2, 1); 
-// for (int i = 0; i < 4; i++)
-// {
-//     channel.response[i]=0;
-// }
-
-// Encode2(&channel,data0,2,0);
-// Encode2(&channel,data1,2,1); 
-// printf("op\n");
-// for (int i = 0; i < 4; i++)
-// {
-//     printf("%d ",channel.response[i]);
-// }
-// return 0;
-// }
-
 void setUp(struct CDMA *channel, int num_stations)
 {
     channel->wtable = (int **)malloc(num_stations * sizeof(int *));
@@ -57,26 +35,6 @@ void setUp(struct CDMA *channel, int num_stations)
     showWalshTable(channel, num_stations);
     printf("setup done \n");
 }
-
-// int Encode(struct CDMA *channel, int *data, int num_stations, int id)
-// {  
-//     for (int k = 0; k <2 ; k++)
-//     {
-//         for (int j = 0; j < num_stations; j++)
-//         {
-//             channel->copy[id][j] = channel->wtable[id][j];
-//             channel->wtable[id][j] *= data[k];
-//         }
-
-//         for (int j = 0; j < num_stations; j++)
-//         {
-//             channel->response[k * num_stations + j] += channel->wtable[id][j];
-//         }
-//     }
-   
-//     printf("gooooooodddd");
-//     return 0;
-// }
 
 void Encode2(struct CDMA *channel, int *data, int num_stations, int id)
     {
