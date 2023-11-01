@@ -10,13 +10,15 @@
 #define PORT 8080
 #define PORT2 8090
 #define MAX_BUFFER_SIZE 512
-#define SERVER_IP "172.18.213.18"
+#define SERVER_IP "172.19.235.128"
 #define NUMBER_OF_CONNECTIONS 2
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
 
 bool server_responded;
 bool client_responded[8];
 char server_side[512];
-
+char client_side[512];
 struct CDMA cdma;
 int server_fd, new_socket;
 int subserver_socket;
@@ -28,9 +30,7 @@ struct in_addr ip_addr;
 void client_server(int id)
 {
     printf("client_server function called with id %d \n", id);
-    client_responded[id] = false;
-    //  int new_socket;
-    //  int server_fd, new_socket;
+    client_responded[id] = true;
     printf("waiting over accept %d \n", id);
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
     {
@@ -41,16 +41,11 @@ void client_server(int id)
         exit(EXIT_FAILURE);
     }
     printf("connected to client no %d \n", id);
-    // char buffer[MAX_BUFFER_SIZE] = {0};
-    // read(new_socket, buffer, MAX_BUFFER_SIZE);
-    // printf("Message from client: %s\n", buffer);
-    // assuming maths
     while (server_responded == false)
     {
         ;
     }
-    //client_responded[id] = false;
-    // now we send Q to the clients
+    client_responded[id] = false;
     send(new_socket, server_side, strlen(server_side), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
     char response[MAX_BUFFER_SIZE] = {0};
@@ -92,14 +87,55 @@ void client_server(int id)
     printf("\n %d",sizeof(cdma.response));
     printf("\n");
     client_responded[id] = true;
-    // printf("hiiiyyy id %d", id);
-    // pthread_exit(NULL);
+}
+
+void server_process()
+{
+    server_responded = false;
+    for (int i = 0; i < 512; i++)
+            server_side[i] = 0;
+    int val = recv(subserver_socket, server_side, MAX_BUFFER_SIZE, 0);
+    server_responded = true;
+    //Server Q has been received
+    struct timespec ts;
+    // Define the duration to sleep (e.g., 2 seconds)
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += 8; 
+    pthread_mutex_lock(&mutex);
+    pthread_cond_timedwait(&condition, &mutex, &ts);
+    bool all_clients_responded = true;
+    for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
+    {
+        printf("client_responded %d is %d \n", i, client_responded[i]);
+        if (client_responded[i] == false)
+        all_clients_responded = false;
+    }
+    while (all_clients_responded == false)
+        {
+            all_clients_responded = true;
+            for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
+            {
+                if (client_responded[i] == false)
+                {
+                    all_clients_responded = false;
+                    // printf(" false set %d ",i);
+                }
+            }
+        }
+        for (int i = 0; i < 2 * NUMBER_OF_CONNECTIONS; i++)
+        {
+            printf("%d ", cdma.response[i]);
+        }
+        
+        printf("%d is size \n",sizeof(cdma.response));
+        send(subserver_socket, cdma.response, 2*sizeof(cdma.response), 0);
+        printf("sent answer to server");        
+    // Unlock the mutex when done
+    
 }
 
 int main()
 {
-    //server_responded = false;
-  
     if ((subserver_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("Socket creation failed");
@@ -122,10 +158,10 @@ int main()
         exit(EXIT_FAILURE);
     }
     printf("Connected to server \n");
-
     ip_addr.s_addr = address.sin_addr.s_addr;
     printf("The source IP address is %s\n", inet_ntoa(ip_addr));
-
+    pthread_t server_thread;
+    pthread_create (&server_thread, NULL, (void *)server_process, (void *)NULL);
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("Socket creation failed");
@@ -149,71 +185,24 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on port %d...\n", PORT2);
-
-    // Accepting incoming connections
+    printf("Sub-Server listening on port %d...\n", PORT2);
     setUp(&cdma, NUMBER_OF_CONNECTIONS);
-    // while (1)
+    
+    pthread_t client_servers[NUMBER_OF_CONNECTIONS];
+
+    int nos[NUMBER_OF_CONNECTIONS];
+    for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
     {
-        // printf("Hello1\n");
-        pthread_t client_servers[NUMBER_OF_CONNECTIONS];
-
-        int nos[NUMBER_OF_CONNECTIONS];
-        for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
-        {
-            nos[i] = i;
-        }
-        // printf("Hello2\n");
-        for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
-        {
-            // printf("Hello3\n");
-            pthread_create(&client_servers[i], NULL, (void *)&client_server, (void *)nos[i]);
-            printf("%d\n", i);
-            printf("\n");
-            // printf("Hello3.5\n");
-        }
-        // printf("hiii jjjjj");
-        for (int i = 0; i < 512; i++)
-            server_side[i] = 0;
-        int val = recv(subserver_socket, server_side, MAX_BUFFER_SIZE, 0);
-        server_responded = true;
-
-        // Server has sent the Q and it is set in server_side
-        bool all_clients_responded = true;
-        // printf("Hello4\n");
-        for (int i = 0; i < 128; i++)
-        {
-            ;
-        }
-        sleep(4);
-        for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
-        {
-            printf("client_responded %d is %d \n", i, client_responded[i]);
-            if (client_responded[i] == false)
-                all_clients_responded = false;
-        }
-        // printf("hope\n");
-        while (all_clients_responded == false)
-        {
-            all_clients_responded = true;
-            for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
-            {
-                if (client_responded[i] == false)
-                {
-                    all_clients_responded = false;
-                    // printf(" false set %d ",i);
-                }
-            }
-        }
-        // send the cdma encoded bitstring to server
-        printf("hope\n");
-        for (int i = 0; i < 2 * NUMBER_OF_CONNECTIONS; i++)
-        {
-            printf("%d ", cdma.response[i]);
-        }
-        
-        printf("%d is size \n",sizeof(cdma.response));
-        send(subserver_socket, cdma.response, 2*sizeof(cdma.response), 0);
-        printf("sent answer to server");
+        nos[i] = i;
     }
+    // printf("Hello2\n");
+    for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
+    {
+        // printf("Hello3\n");
+        pthread_create(&client_servers[i], NULL, (void *)&client_server, (void *)nos[i]);
+        printf("%d\n", i);
+        printf("\n");
+        
+    }
+    pthread_join(server_thread, NULL);
 }
