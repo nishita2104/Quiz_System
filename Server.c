@@ -99,12 +99,18 @@ int main() {
             serverquestion[strlen(serverquestion)-1] = ' ';
                 for(int i=0;i<4;i++)
                 {
-                    fgets(options[i], sizeof(options[i]), stdin);
+                    sprintf(options[i],"%d",i+1);
+                    sprintf(options[i]+1,"%c",'.');
+                    sprintf(options[i]+2,"%c",' ');
+                    fgets(options[i]+3, sizeof(options[i]), stdin);
                     serverquestion[strlen(serverquestion)-1] = ' ';
                     serverquestion[strlen(serverquestion)] = '\n';
-                    strcpy(serverquestion+(strlen(serverquestion)+1),options[i]);
+                    strcpy(serverquestion+(strlen(serverquestion)), options[i]);
+                    // printf("%d %s\n",i,serverquestion);
                 }
+                // serverquestion[strlen(serverquestion)-1] = ' ';
             serverquestion[strlen(serverquestion)] = '\0';
+            printf("%s\n",serverquestion);
             // strcpy(serverquestion,"What is square root of 25?\n 1. 2\n 2. 3\n 3. 5\n 4. 7\n Enter 1, 2, 3 or 4\n");
             int val;
     // printf("%s\n",serverquestion);

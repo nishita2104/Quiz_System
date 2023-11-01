@@ -43,9 +43,9 @@ int main() {
     // printf("Message sent to server: %s\n", message);
 
     char buffer[2][MAX_BUFFER_SIZE] = {0};
-    // printf("started rec");
+    printf("started rec");
     int val = recv(client_socket, buffer, sizeof(buffer),0);
-    // printf(val);
+    printf("checkpt-2");
     printf("%s \n", buffer[0]);
     printf("%s \n", buffer[1]);
     char answer[512];

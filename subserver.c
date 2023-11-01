@@ -9,7 +9,7 @@
 /*fprintf(outputFile, "%s\n", serverresponse);*/
 #define PORT 8080
 #define PORT2 8090
-#define MAX_BUFFER_SIZE 512
+#define MAX_BUFFER_SIZE 1024
 #define SERVER_IP "172.19.235.128"
 #define NUMBER_OF_CONNECTIONS 2
 
@@ -54,8 +54,10 @@ void client_server(int id)
     char qs[2][1024];
     sprintf(qs[0],"%d",id);
     strcpy(qs[1], server_side);
+    printf("qs is: %d %s\n",qs[0],qs[1]);
     send(new_socket, qs, sizeof(qs), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
+    printf("bheja %d\n",id);
     char response[MAX_BUFFER_SIZE] = {0};
     recv(new_socket, response, 512, 0);
     // printf("%s \n",response);
@@ -187,6 +189,7 @@ int main()
         for (int i = 0; i < 512; i++)
             server_side[i] = 0;
         int val = recv(subserver_socket, server_side, MAX_BUFFER_SIZE, 0);
+        sleep(8);
         server_responded = true;
 
         // Server has sent the Q and it is set in server_side
