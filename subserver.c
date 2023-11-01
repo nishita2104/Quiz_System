@@ -11,7 +11,7 @@
 #define PORT2 8090
 #define MAX_BUFFER_SIZE 1024
 #define SERVER_IP "172.19.235.128"
-#define NUMBER_OF_CONNECTIONS 2
+#define NUMBER_OF_CONNECTIONS 4
 
 bool server_responded;
 bool client_responded[8];
@@ -27,10 +27,6 @@ struct in_addr ip_addr;
 
 void client_server(int id)
 {
-    printf("client_server function called with id %d \n", id);
-    client_responded[id] = false;
-    //  int new_socket;
-    //  int server_fd, new_socket;
     printf("waiting over accept %d \n", id);
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
     {
@@ -41,10 +37,6 @@ void client_server(int id)
         exit(EXIT_FAILURE);
     }
     printf("connected to client no %d \n", id);
-    // char buffer[MAX_BUFFER_SIZE] = {0};
-    // read(new_socket, buffer, MAX_BUFFER_SIZE);
-    // printf("Message from client: %s\n", buffer);
-    // assuming maths
     while (server_responded == false)
     {
         ;
@@ -54,15 +46,14 @@ void client_server(int id)
     char qs[2][1024];
     sprintf(qs[0],"%d",id);
     strcpy(qs[1], server_side);
-    printf("qs is: %d %s\n",qs[0],qs[1]);
+    printf("Question is: %s %s\n",qs[0],qs[1]);
     send(new_socket, qs, sizeof(qs), 0);
     // we recieve response from clients and respectively set the client_responded[id] to true
-    printf("bheja %d\n",id);
     char response[MAX_BUFFER_SIZE] = {0};
     recv(new_socket, response, 512, 0);
     // printf("%s \n",response);
     int data[2] = {0, 0};
-    printf("id %d %s\n", id, response);
+    printf("For ID: %d, response = %s\n", id, response);
     if (strcmp(response,"2")==0)
     {
         data[0] = 1;
@@ -76,7 +67,6 @@ void client_server(int id)
         data[0] = 1;
         data[1] = 1;
     }
-    // printf("hello6");
     printf("wtable\n");
     for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
     {
@@ -89,7 +79,6 @@ void client_server(int id)
     printf("%d ", data[1]);
     printf("%d \n", data[0]);
     Encode2(&cdma, data, NUMBER_OF_CONNECTIONS, id);
-    // printf("hello7");
     for (int i = 0; i < 4; i++)
     {
         printf("%d ", cdma.response[i]);
@@ -97,12 +86,12 @@ void client_server(int id)
     printf("\n %d",sizeof(cdma.response));
     printf("\n");
     client_responded[id] = true;
-    // printf("hiiiyyy id %d", id);
-    // pthread_exit(NULL);
 }
 
 int main()
 {
+    for(int i=0;i<4;i++)
+    client_responded[i] = false;
     server_responded = false;
     FILE *inputFile;
     char character;
@@ -168,7 +157,6 @@ int main()
     setUp(&cdma, NUMBER_OF_CONNECTIONS);
     // while (1)
     {
-        // printf("Hello1\n");
         pthread_t client_servers[NUMBER_OF_CONNECTIONS];
 
         int nos[NUMBER_OF_CONNECTIONS];
@@ -176,25 +164,24 @@ int main()
         {
             nos[i] = i;
         }
-        // printf("Hello2\n");
+
         for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
         {
-            // printf("Hello3\n");
+
             pthread_create(&client_servers[i], NULL, (void *)&client_server, (void *)nos[i]);
             printf("%d\n", i);
             printf("\n");
-            // printf("Hello3.5\n");
         }
-        // printf("hiii jjjjj");
+
         for (int i = 0; i < 512; i++)
             server_side[i] = 0;
         int val = recv(subserver_socket, server_side, MAX_BUFFER_SIZE, 0);
-        sleep(8);
+        sleep(4);
         server_responded = true;
 
         // Server has sent the Q and it is set in server_side
         bool all_clients_responded = true;
-        // printf("Hello4\n");
+
         for (int i = 0; i < 128; i++)
         {
             ;
@@ -206,7 +193,7 @@ int main()
             if (client_responded[i] == false)
                 all_clients_responded = false;
         }
-        // printf("hope\n");
+
         while (all_clients_responded == false)
         {
             all_clients_responded = true;
@@ -215,19 +202,18 @@ int main()
                 if (client_responded[i] == false)
                 {
                     all_clients_responded = false;
-                    // printf(" false set %d ",i);
                 }
             }
         }
         // send the cdma encoded bitstring to server
-        printf("hope\n");
+        printf("CDMA response is : \n");
         for (int i = 0; i < 2 * NUMBER_OF_CONNECTIONS; i++)
         {
             printf("%d ", cdma.response[i]);
         }
         
-        printf("%d is size \n",sizeof(cdma.response));
-        send(subserver_socket, cdma.response, 2*sizeof(cdma.response), 0);
+        printf("\n %d is size \n",sizeof(cdma.response));
+        send(subserver_socket, cdma.response, NUMBER_OF_CONNECTIONS*sizeof(cdma.response), 0);
         printf("sent answer to server");
     }
 }

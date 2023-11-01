@@ -7,7 +7,7 @@
 
 #define PORT 8090
 #define MAX_BUFFER_SIZE 1024
-#define SERVER_IP "172.19.235.128"  // Replace with the actual IP address of the server
+#define SERVER_IP "172.19.235.128" // Replace with the actual IP address of the server
 
 int main() {
     int client_socket;
@@ -43,10 +43,10 @@ int main() {
     // printf("Message sent to server: %s\n", message);
 
     char buffer[2][MAX_BUFFER_SIZE] = {0};
-    printf("started rec");
+    printf("started receiving \n");
     int val = recv(client_socket, buffer, sizeof(buffer),0);
-    printf("checkpt-2");
-    printf("%s \n", buffer[0]);
+    //printf("checkpt-2");
+    printf("id is: %s \n", buffer[0]);
     printf("%s \n", buffer[1]);
     char answer[512];
     fgets(answer, sizeof(answer), stdin);

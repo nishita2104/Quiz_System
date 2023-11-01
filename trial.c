@@ -28,6 +28,17 @@ int main() {
                 printf("%s\n",serverquestion);
             serverquestion[strlen(serverquestion)] = '\0';
             printf("%s\n",serverquestion);
+            char correct_option[MAX_BUFFER_SIZE];
+            printf("Enter correct option number\n");
+            fgets(correct_option, sizeof(correct_option), stdin);
+            int csum1=0, csum2=0;
+            if(correct_option=="2") csum1=1;
+            else if(correct_option=="3") csum2=1;
+            else 
+            {
+                csum1=1;
+                csum2=1;
+            }
     return 0;
  
 }

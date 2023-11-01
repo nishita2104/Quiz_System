@@ -6,7 +6,7 @@
 // #include "subserver.c"
 #include "cdma.c"
 
-#define NUMBER_OF_CONNECTIONS 2
+#define NUMBER_OF_CONNECTIONS 4
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 #define ARRAY_SIZE NUMBER_OF_CONNECTIONS*MAX_BUFFER_SIZE / (sizeof(int)*128)
@@ -95,7 +95,7 @@ int main() {
     {
             printf("Enter Question: \n");
             fgets(serverquestion, sizeof(serverquestion), stdin);
-            
+            printf("Enter 4 options\n");
             serverquestion[strlen(serverquestion)-1] = ' ';
                 for(int i=0;i<4;i++)
                 {
@@ -111,6 +111,21 @@ int main() {
                 // serverquestion[strlen(serverquestion)-1] = ' ';
             serverquestion[strlen(serverquestion)] = '\0';
             printf("%s\n",serverquestion);
+            
+            char correct_option[MAX_BUFFER_SIZE];
+            printf("Enter correct option number\n");
+            fgets(correct_option, sizeof(correct_option), stdin);
+            correct_option[strlen(correct_option)-1]='\0';
+            printf("%s\n",correct_option);
+            int csum1=0, csum2=0;
+            if(strcmp(correct_option,"2")==0) csum1=1;
+            else if(strcmp(correct_option,"3")==0) csum2=1;
+            else if(strcmp(correct_option,"4")==0)
+            {
+                csum1=1;
+                csum2=1;
+            }
+            
             // strcpy(serverquestion,"What is square root of 25?\n 1. 2\n 2. 3\n 3. 5\n 4. 7\n Enter 1, 2, 3 or 4\n");
             int val;
     // printf("%s\n",serverquestion);
@@ -135,6 +150,7 @@ int main() {
             // }
             printf("end checking\n");
             // printf("hiii-5\n");
+            printf("correct answers %d %d\n",csum1,csum2);
             for (int i = 0; i < NUMBER_OF_CONNECTIONS; i++)
             {
                 int sum1=0;
@@ -151,7 +167,7 @@ int main() {
                 // printf("hiii-7\n");
                 memset(serverresponse,'\0', sizeof(serverresponse));
                 printf("%d %d\n",sum2,sum1);
-                if (sum1==0&&sum2==1)
+                if (sum1==csum1&&sum2==csum2)
                 {
                     strcpy(serverresponse,"Correct\0");
                 }
