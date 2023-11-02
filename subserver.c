@@ -93,10 +93,6 @@ int main()
     for(int i=0;i<4;i++)
     client_responded[i] = false;
     server_responded = false;
-    FILE *inputFile;
-    char character;
-    inputFile = fopen("input.txt", "w");
-
     for (int i = 0; i < 512; i++)
     {
         client_side[i] = 0;
